@@ -59,12 +59,33 @@ void get_arg(size_t num, char* content, char** arg) {
 
     size_t len = 0;
     char* res = malloc(end - start + 1);
+    if(!res){
+        nlog(1, "Failed to malloc the memory for get_arg()");
+        return;
+    }
     for(size_t j = start; j < end; j++){
         res[len++] = content[j];
     }
     res[len++] = '\0';
 
     *arg = res;
+}
+
+size_t get_args(char* content){
+    if(!content){
+        return 0;
+    }
+
+    size_t size = strlen(content);
+    size_t res = 0;
+    for(size_t i = 0; i < size; i++){
+        if(content[i] == ' ' || i == size - 1){
+            res++;
+            while(content[i] == ' ') i++;
+        }
+    }
+
+    return res;
 }
 
 void nlog(size_t index, const char* prompt){

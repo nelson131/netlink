@@ -11,7 +11,7 @@ int main(){
     while((input = readline("> "))){
         char* command = NULL;
         get_arg(0, input, &command);
-        if(!strcmp(command, "open")){
+        if(!strcmp(command, "open") || !strcmp(command, "connect")){
             if(get_args(input) == 3){
                 char* port = NULL;
                 get_arg(1, input, &command);
@@ -21,28 +21,45 @@ int main(){
                     port = "8080";
                 }
 
-                if(serv_init(&network, port) != 0 || serv_conn(&network) != 0){
-                    nlog(1, "Something went wrong in server setup");
-                    free(command);
-                    break;
+                char* ip = NULL;
+                get_arg(2, input, &command);
+                if(strcmp(command, "def") != 0){
+                    ip = command;
+                } else {
+                    ip = "127.0.0.1";
                 }
 
-                size_t close_it = 0;
-                chat(network.connfd, &close_it);
-                if(close_it){
-                    free(command);
-                    break;
+                get_arg(0, input, &command);
+                if(!strcmp(command, "open")){
+                    if(serv_init(&network, ip, port) != 0 || serv_conn(&network) != 0){
+                        nlog(1, "Something went wrong in server setup");
+                        free(command);
+                        break;
+                    }
+
+                    size_t close_it = 0;
+                    chat(network.connfd, &close_it);
+                    if(close_it){
+                        free(command);
+                        break;
+                    }
+                } else {
+                    if(cli_init(&network, ip, port) != 0 || cli_conn(&network) != 0){
+                        nlog(1, "Something went wrong in client side");
+                        free(command);
+                        break;
+                    }
+
+                    size_t close_it = 0;
+                    chat(network.sockfd, &close_it);
+                    if(close_it){
+                        free(command);
+                        break;
+                    }
                 }
                 
             } else {
-                log(1, "Usage: open <port:def/8080...>");
-            }
-        } else if(!strcmp(command, "connect")){
-            if(cli_init(&network) != 0 || cli_conn(&network) != 0){
-                nlog(1, "Something went wrong in client setup");
-                quit(&network);
-                free(command);
-                break;
+                log(1, "Usage: open/connect <port:def/8080...> <ip:def/...>");
             }
         } else {
             nlog(1, "Usage: <command:open/connect>");

@@ -13,10 +13,10 @@ struct net {
     struct sockaddr_in servaddr, cli;
 } typedef net;
 
-int serv_init(net* server, char* port);
+int serv_init(net* server, char* ip, char* port);
 int serv_conn(net* server);
 
-int cli_init(net* client);
+int cli_init(net* client, char* ip, char* port);
 int cli_conn(net* client);
 
 void quit(net* net);

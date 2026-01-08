@@ -4,19 +4,20 @@
 #define DEFAULT_PORT 8080
 #define MAX_CAPACITY 80
 
-int serv_init(net* server, char* port){
+int serv_init(net* server, char* ip, char* port){
     server->sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if(server->sockfd == -1){
         nlog(1, "Failed to create a socket");
         return -1;
     }
 
-    server->servaddr.sin_family = AF_INET;
-    server->servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
     int p = DEFAULT_PORT;
     if(port){
         p = atoi(port);
     }
+
+    server->servaddr.sin_family = AF_INET;
+    server->servaddr.sin_addr.s_addr = inet_addr(ip);
     server->servaddr.sin_port = htons(p);
 
     if(bind(server->sockfd, (struct sockaddr*) &server->servaddr, sizeof(server->servaddr)) != 0){
@@ -46,16 +47,21 @@ int serv_conn(net* server){
     return 0;
 }
 
-int cli_init(net* client){
+int cli_init(net* client, char* ip, char* port){
     client->sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if(client->sockfd == -1){
         nlog(1, "Failed to create a socket in client side");
         return -1;
     }
 
+    int p = DEFAULT_PORT;
+    if(port){
+        p = atoi(port);
+    }
+
     client->servaddr.sin_family = AF_INET;
-    client->servaddr.sin_addr.s_addr = inet_addr("127.0.0.1");
-    client->servaddr.sin_port = htons(DEFAULT_PORT);
+    client->servaddr.sin_addr.s_addr = inet_addr(ip);
+    client->servaddr.sin_port = htons(p);
 
     return 0;
 }

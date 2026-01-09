@@ -5,6 +5,7 @@
 #define MAX_CAPACITY 80
 
 int serv_init(net* server, char* ip, char* port){
+    memset(&server->servaddr, 0, sizeof(server->servaddr));
     server->sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if(server->sockfd == -1){
         nlog(1, "Failed to create a socket");
@@ -49,6 +50,7 @@ int serv_conn(net* server){
 }
 
 int cli_init(net* client, char* ip, char* port){
+    memset(&client->servaddr, 0, sizeof(client->servaddr));
     client->sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if(client->sockfd == -1){
         nlog(1, "Failed to create a socket in client side");
@@ -61,8 +63,12 @@ int cli_init(net* client, char* ip, char* port){
     }
 
     client->servaddr.sin_family = AF_INET;
-    client->servaddr.sin_addr.s_addr = inet_addr(ip);
     client->servaddr.sin_port = htons(p);
+
+    if(inet_pton(AF_INET, ip, &client->servaddr.sin_addr) <= 0){
+        perror("inet_pton");
+        return -1;
+    }
 
     return 0;
 }

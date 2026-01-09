@@ -17,10 +17,11 @@ int serv_init(net* server, char* ip, char* port){
     }
 
     server->servaddr.sin_family = AF_INET;
-    server->servaddr.sin_addr.s_addr = inet_addr(ip);
+    server->servaddr.sin_addr.s_addr = INADDR_ANY;
     server->servaddr.sin_port = htons(p);
 
     if(bind(server->sockfd, (struct sockaddr*) &server->servaddr, sizeof(server->servaddr)) != 0){
+        perror("bind");
         nlog(1, "Failed to bind the server socket");
         return -1;
     }
@@ -68,6 +69,7 @@ int cli_init(net* client, char* ip, char* port){
 
 int cli_conn(net* client){
     if(connect(client->sockfd, (struct sockaddr*) &client->servaddr, sizeof(client->servaddr)) != 0){
+        perror("connect");
         nlog(1, "Failed to connect client side");
         return -1;
     } else {

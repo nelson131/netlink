@@ -7,6 +7,10 @@
 int main(){
     char* input = NULL;
     net network;
+    network.sockfd = 0;
+    network.connfd = 0;
+
+    send_welcome();
 
     while((input = readline("> "))){
         char* command = NULL;
@@ -59,8 +63,11 @@ int main(){
                 }
                 
             } else {
-                log(1, "Usage: open/connect <port:def/8080...> <ip:def/...>");
+                nlog(1, "Usage: open/connect <port:def/8080...> <ip:def/...>");
             }
+        } else if (!strcmp(command, "exit")){
+            free(command);
+            break;
         } else {
             nlog(1, "Usage: <command:open/connect>");
         }

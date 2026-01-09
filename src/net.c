@@ -80,11 +80,12 @@ int cli_conn(net* client){
 void quit(net* net){
     if(net->sockfd > 0){
         close(net->sockfd);
+        nlog(0, "Server socket has been closed");
     }
     if(net->connfd > 0){
         close(net->connfd);
+        nlog(0, "Client socket has been closed");
     }
-    nlog(0, "Server socket has been closed");
 }
 
 void chat(int socket, size_t* close_it){
@@ -93,7 +94,7 @@ void chat(int socket, size_t* close_it){
     while(1){
         bzero(buff, MAX_CAPACITY);
         read(socket, buff, MAX_CAPACITY - 1);
-        nlog("\n", buff);
+        printf("\n%s", buff);
         bzero(buff, MAX_CAPACITY);
         n = 0;
 

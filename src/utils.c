@@ -88,6 +88,14 @@ size_t get_args(char* content){
     return res;
 }
 
+void send_welcome(){
+    printf(" netlink \n");
+    printf("commands:\n");
+    printf("-open -> starts link as server\n");
+    printf("-connect -> starts link as client\n");
+    printf("-exit -> fuck off\n");
+}
+
 void nlog(size_t index, const char* prompt){
     char* prefix = NULL;
     switch (index){

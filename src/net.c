@@ -104,7 +104,7 @@ void quit(net* net){
     }
 }
 
-void chat(int socket, size_t* close_it){
+void chat(int socket){
     char buff[MAX_CAPACITY];
     int n;
     while(1){
@@ -119,7 +119,6 @@ void chat(int socket, size_t* close_it){
         write(socket, buff, strlen(buff));
 
         if(strncmp("exit", buff, 4) == 0){
-            *close_it = 1;
             nlog(2, "Connection closed.");
             break;
         }

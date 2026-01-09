@@ -21,6 +21,6 @@ int cli_conn(net* client);
 
 void quit(net* net);
 
-void chat(int socket, size_t* close_it);
+void chat(int socket);
 
 #endif

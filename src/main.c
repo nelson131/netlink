@@ -6,6 +6,8 @@
 
 int main(){
     char* input = NULL;
+    char* arg1 = NULL;
+    char* arg2 = NULL;
     net network;
     network.sockfd = 0;
     network.connfd = 0;
@@ -17,23 +19,12 @@ int main(){
         get_arg(0, input, &command);
         if(!strcmp(command, "open") || !strcmp(command, "connect")){
             if(get_args(input) == 3){
-                char* port = NULL;
-                get_arg(1, input, &command);
-                if(strcmp(command, "def") != 0){
-                    port = command;
-                } else {
-                    port = "8080";
-                }
+                get_arg(1, input, &arg1);
+                get_arg(2, input, &arg2);
 
-                char* ip = NULL;
-                get_arg(2, input, &command);
-                if(strcmp(command, "def") != 0){
-                    ip = command;
-                } else {
-                    ip = "127.0.0.1";
-                }
-
-                get_arg(0, input, &command);
+                char* port = (!strcmp(arg1, "def")) ? "8080" : arg1;
+                char* ip = (!strcmp(arg2, "def")) ? "127.0.0.1" : arg2;
+        
                 if(!strcmp(command, "open")){
                     if(serv_init(&network, ip, port) != 0 || serv_conn(&network) != 0){
                         nlog(1, "Something went wrong in server setup");
@@ -41,12 +32,11 @@ int main(){
                         break;
                     }
 
-                    size_t close_it = 0;
-                    chat(network.connfd, &close_it);
-                    if(close_it){
-                        free(command);
-                        break;
-                    }
+                    chat(network.connfd);
+                    free(command);
+                    free(port);
+                    free(ip);
+                    break;
                 } else {
                     if(cli_init(&network, ip, port) != 0 || cli_conn(&network) != 0){
                         nlog(1, "Something went wrong in client side");
@@ -54,12 +44,11 @@ int main(){
                         break;
                     }
 
-                    size_t close_it = 0;
-                    chat(network.sockfd, &close_it);
-                    if(close_it){
-                        free(command);
-                        break;
-                    }
+                    chat(network.sockfd);
+                    free(command);
+                    free(port);
+                    free(ip);
+                    break;
                 }
                 
             } else {
@@ -79,6 +68,8 @@ int main(){
     
     if(input) free(input);
     quit(&network);
+    if(arg1) free(arg1);
+    if(arg2) free(arg2);
 
     return 0;
 }

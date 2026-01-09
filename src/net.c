@@ -50,6 +50,10 @@ int serv_conn(net* server){
 }
 
 int cli_init(net* client, char* ip, char* port){
+    nlog(2, "Trying to connect by: ");
+    nlog(2, ip);
+    nlog(2, port);
+
     memset(&client->servaddr, 0, sizeof(client->servaddr));
     client->sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if(client->sockfd == -1){
@@ -65,7 +69,11 @@ int cli_init(net* client, char* ip, char* port){
     client->servaddr.sin_family = AF_INET;
     client->servaddr.sin_port = htons(p);
 
-    if(inet_pton(AF_INET, ip, &client->servaddr.sin_addr) <= 0){
+    int ret = inet_pton(AF_INET, ip, &client->servaddr.sin_addr);
+    if(ret == 0){
+        nlog(1, "Invalid ip address format");
+        return -1;
+    } else if(ret < 0){
         perror("inet_pton");
         return -1;
     }
